@@ -50,9 +50,6 @@ class TestHealthEndpoint:
         
         if "system" in data:
             assert isinstance(data["system"], dict)
-            
-        if "environment" in data:
-            assert isinstance(data["environment"], dict)
     
     def test_health_check_timestamp_recent(self):
         """Test that the timestamp is recent (within last minute)"""
@@ -97,13 +94,6 @@ class TestHealthEndpoint:
         assert 0 <= disk["used_percent"] <= 100
         assert isinstance(disk["free_gb"], (int, float))
         assert disk["free_gb"] >= 0
-        
-        # Test environment info
-        assert "environment" in data
-        env = data["environment"]
-        assert isinstance(env["python_version"], str)
-        assert isinstance(env["platform"], str)
-        assert isinstance(env["hostname"], str)
 
 class TestAPIBehavior:
     """Test general API behavior"""

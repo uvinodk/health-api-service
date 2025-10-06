@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from datetime import datetime
 import logging
 import psutil
-import platform
 import time
 
 # Configure logging
@@ -55,11 +54,6 @@ async def health_check():
                     "used_percent": round((disk.used / disk.total) * 100, 1),
                     "free_gb": round(disk.free / (1024**3), 2)
                 }
-            },
-            "environment": {
-                "python_version": platform.python_version(),
-                "platform": platform.system(),
-                "hostname": platform.node()
             }
         }
         

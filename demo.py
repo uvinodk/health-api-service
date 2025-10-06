@@ -60,9 +60,6 @@ def show_documentation_info():
 
 def main():
     """Main demo function"""
-    print("=" * 50)
-    print("    Health API Service Demo")
-    print("=" * 50)
     
     # Start server
     process = start_server()

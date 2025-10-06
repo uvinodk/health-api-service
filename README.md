@@ -34,11 +34,6 @@ Returns the health status of the application with system metrics.
       "used_percent": 2.3,
       "free_gb": 365.91
     }
-  },
-  "environment": {
-    "python_version": "3.9.6",
-    "platform": "Darwin",
-    "hostname": "Vinods-MacBook-Pro.local"
   }
 }
 ```
@@ -114,11 +109,6 @@ Example response:
     "cpu_usage_percent": 13.6,
     "memory": {"used_percent": 66.8, "available_gb": 7.96},
     "disk": {"used_percent": 2.3, "free_gb": 365.91}
-  },
-  "environment": {
-    "python_version": "3.9.6",
-    "platform": "Darwin",
-    "hostname": "MacBook-Pro.local"
   }
 }
 ```
@@ -158,7 +148,3 @@ The health endpoint provides comprehensive system information:
   - **cpu_usage_percent**: Current CPU utilization
   - **memory**: Memory usage percentage and available GB
   - **disk**: Disk usage percentage and free GB
-- **environment**: Runtime environment information
-  - **python_version**: Python interpreter version
-  - **platform**: Operating system platform
-  - **hostname**: Server hostname
