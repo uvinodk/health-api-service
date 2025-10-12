@@ -24,13 +24,13 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install pre-commit pytest
+          pip install pre-commit pytest pytest-cov
 
       - name: Run pre-commit hooks
         run: pre-commit run --all-files
 
-      - name: Run tests
-        run: pytest -q
+      - name: Run tests with coverage
+        run: pytest --cov=. --cov-report=xml
 
       - name: SonarQube scan
         uses: SonarSource/sonarqube-scan-action@v6
