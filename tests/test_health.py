@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from datetime import datetime
+from unittest.mock import patch
 from main import app
 
 # Create test client
@@ -117,3 +118,78 @@ class TestAPIBehavior:
 
         response = client.delete("/health")
         assert response.status_code == 405
+
+
+class TestHealthEndpointExceptions:
+    """Test exception handling in the health check endpoint"""
+
+    @patch("main.psutil.virtual_memory")
+    def test_health_check_memory_exception(self, mock_memory):
+        """Test health check when psutil memory check fails"""
+        # Mock psutil.virtual_memory to raise an exception
+        mock_memory.side_effect = Exception("Memory check failed")
+
+        response = client.get("/health")
+
+        assert response.status_code == 500
+        assert response.json()["detail"] == "Internal server error"
+
+    @patch("main.psutil.cpu_percent")
+    def test_health_check_cpu_exception(self, mock_cpu):
+        """Test health check when psutil CPU check fails"""
+        # Mock psutil.cpu_percent to raise an exception
+        mock_cpu.side_effect = Exception("CPU check failed")
+
+        response = client.get("/health")
+
+        assert response.status_code == 500
+        assert response.json()["detail"] == "Internal server error"
+
+    @patch("main.psutil.disk_usage")
+    def test_health_check_disk_exception(self, mock_disk):
+        """Test health check when psutil disk check fails"""
+        # Mock psutil.disk_usage to raise an exception
+        mock_disk.side_effect = Exception("Disk check failed")
+
+        response = client.get("/health")
+
+        assert response.status_code == 500
+        assert response.json()["detail"] == "Internal server error"
+
+    @patch("main.datetime")
+    def test_health_check_datetime_exception(self, mock_datetime):
+        """Test health check when datetime fails"""
+        # Mock datetime.utcnow to raise an exception
+        mock_datetime.utcnow.side_effect = Exception("Datetime failed")
+
+        response = client.get("/health")
+
+        assert response.status_code == 500
+        assert response.json()["detail"] == "Internal server error"
+
+
+class TestFormatUptimeFunction:
+    """Test the format_uptime utility function"""
+
+    def test_format_uptime_seconds(self):
+        """Test uptime formatting for seconds"""
+        from main import format_uptime
+
+        assert format_uptime(30) == "30s"
+        assert format_uptime(59.9) == "59s"
+
+    def test_format_uptime_minutes(self):
+        """Test uptime formatting for minutes and seconds"""
+        from main import format_uptime
+
+        assert format_uptime(60) == "1m 0s"
+        assert format_uptime(90) == "1m 30s"
+        assert format_uptime(3599) == "59m 59s"
+
+    def test_format_uptime_hours(self):
+        """Test uptime formatting for hours and minutes"""
+        from main import format_uptime
+
+        assert format_uptime(3600) == "1h 0m"
+        assert format_uptime(3660) == "1h 1m"
+        assert format_uptime(7320) == "2h 2m"
