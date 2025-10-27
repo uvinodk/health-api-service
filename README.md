@@ -148,3 +148,25 @@ The health endpoint provides comprehensive system information:
   - **cpu_usage_percent**: Current CPU utilization
   - **memory**: Memory usage percentage and available GB
   - **disk**: Disk usage percentage and free GB
+
+### Docker
+
+Run the build command from the project root
+```
+docker build -t health-api:latest .
+```
+
+Run container
+```
+docker run -d -p 8000:8000 --name health-api health-api:latest
+```
+
+Check health endpoint
+```
+curl http://localhost:8000/health
+```
+
+Using docker compose
+```
+docker-compose up --build
+```
