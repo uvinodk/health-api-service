@@ -67,3 +67,22 @@ jobs:
           echo "Building and pushing $IMAGE"
           docker build -t $IMAGE .
           docker push $IMAGE
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Verify manifests
+        run: |
+          echo "Verifying Kubernetes manifests..."
+          kubectl apply --dry-run=client -f k8s/app.yaml
