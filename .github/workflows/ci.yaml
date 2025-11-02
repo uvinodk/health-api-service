@@ -85,4 +85,6 @@ jobs:
       - name: Verify manifests
         run: |
           echo "Verifying Kubernetes manifests..."
-          kubectl apply --dry-run=client -f k8s/app.yaml
+          kubectl apply --dry-run=client -f k8s/namespace.yaml
+          kubectl apply --dry-run=client -f k8s/deployment.yaml
+          kubectl apply --dry-run=client -f k8s/service.yaml
