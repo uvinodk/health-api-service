@@ -77,6 +77,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      - name: Set up Kind cluster
+        uses: helm/kind-action@v1
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -85,6 +88,12 @@ jobs:
       - name: Verify manifests
         run: |
           echo "Verifying Kubernetes manifests..."
-          kubectl apply --dry-run=client -f k8s/namespace.yaml
-          kubectl apply --dry-run=client -f k8s/deployment.yaml
-          kubectl apply --dry-run=client -f k8s/service.yaml
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Rollout
+        run: kubectl rollout status deployment/health-api -n health-api
+
+      - name: List deployments
+        run: kubectl get deployments -n health-api
