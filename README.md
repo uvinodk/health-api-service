@@ -170,3 +170,23 @@ Using docker compose
 ```
 docker-compose up --build
 ```
+
+### Kubernetes
+
+Deploy to Kubernetes
+```bash
+kubectl apply -f k8s/
+kubectl get pods -n health-api
+```
+
+Access the service
+```bash
+kubectl port-forward -n health-api svc/health-api 8000:8000
+curl http://localhost:8000/health
+```
+
+Scale the deployment
+```bash
+kubectl scale deployment health-api -n health-api --replicas=5
+kubectl get pods -n health-api -w
+```
