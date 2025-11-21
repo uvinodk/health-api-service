@@ -71,23 +71,27 @@ jobs:
   deploy:
     needs: build
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Set up Kind cluster
-        uses: helm/kind-action@v1
+      - name: Verify Minikube status
+        run: minikube status || minikube start
 
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
+      - name: Set Minikube context
+        run: kubectl config use-context minikube
 
-      - name: Verify manifests
+      - name: Pull latest image
         run: |
-          echo "Verifying Kubernetes manifests..."
+          IMAGE=ghcr.io/${{ github.repository }}:latest
+          docker pull $IMAGE
+          # Make image available to Minikube
+          minikube image load $IMAGE
+
+      - name: Deploy to Minikube
+        run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
