@@ -173,20 +173,62 @@ docker-compose up --build
 
 ### Kubernetes
 
-Deploy to Kubernetes
+#### Local Development with Minikube
+
+Prerequisites:
+- Minikube installed on your local machine
+- Docker installed
+- kubectl installed
+
+Start Minikube:
+```bash
+minikube start
+```
+
+Deploy to Minikube:
 ```bash
 kubectl apply -f k8s/
 kubectl get pods -n health-api
 ```
 
-Access the service
+Load Docker image into Minikube:
 ```bash
+# Build the image
+docker build -t health-api:latest .
+
+# Load the image into Minikube
+minikube image load health-api:latest
+
+# Update the deployment to use the local image if needed
+kubectl set image deployment/health-api -n health-api health-api=health-api:latest
+```
+
+Access the service:
+```bash
+minikube service health-api -n health-api --url
+# Or use port-forwarding
 kubectl port-forward -n health-api svc/health-api 8000:8000
 curl http://localhost:8000/health
 ```
 
-Scale the deployment
+Scale the deployment:
 ```bash
 kubectl scale deployment health-api -n health-api --replicas=5
 kubectl get pods -n health-api -w
 ```
+
+#### CI/CD with Self-Hosted Runner
+
+This project uses GitHub Actions with a self-hosted runner to deploy to a local Minikube cluster.
+
+Setting up a self-hosted runner:
+1. On GitHub, go to your repository settings
+2. Navigate to Actions > Runners
+3. Click "New self-hosted runner"
+4. Follow the instructions to download and configure the runner on your local machine
+5. Make sure the runner has access to your local Minikube cluster
+
+The CI/CD pipeline will:
+1. Run tests and code quality checks
+2. Build and push the Docker image to GitHub Container Registry
+3. Deploy the application to your local Minikube cluster using the self-hosted runner
