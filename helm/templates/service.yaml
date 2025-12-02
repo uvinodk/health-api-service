@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "health-api-service.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "health-api-service.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPort }}
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "health-api-service.selectorLabels" . | nindent 4 }}
