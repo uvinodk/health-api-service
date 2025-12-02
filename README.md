@@ -217,6 +217,33 @@ kubectl scale deployment health-api -n health-api --replicas=5
 kubectl get pods -n health-api -w
 ```
 
+### Helm
+
+Deploy using Helm:
+```bash
+helm install health-api ./helm
+```
+
+Deploy with custom values:
+```bash
+helm install health-api ./helm --set replicaCount=5
+```
+
+Upgrade deployment:
+```bash
+helm upgrade health-api ./helm
+```
+
+Uninstall:
+```bash
+helm uninstall health-api
+```
+
+Check deployment:
+```bash
+kubectl get all -n health-api
+```
+
 #### CI/CD with Self-Hosted Runner
 
 This project uses GitHub Actions with a self-hosted runner to deploy to a local Minikube cluster.

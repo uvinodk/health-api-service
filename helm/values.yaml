@@ -1,0 +1,27 @@
+replicaCount: 3
+
+image:
+  repository: ghcr.io/uvinodk/health-api-service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+namespace: health-api
+
+service:
+  type: NodePort
+  port: 8000
+  targetPort: 8000
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 5
