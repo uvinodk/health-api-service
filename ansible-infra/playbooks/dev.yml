@@ -1,0 +1,9 @@
+---
+- name: Deploy Health API to Dev
+  hosts: webservers
+  become: yes
+
+  roles:
+    - common
+    - docker
+    - health_api

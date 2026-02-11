@@ -1,0 +1,36 @@
+---
+- name: Test Ansible Setup
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Check Python version
+      command: python3 --version
+      register: python_version
+
+    - name: Display Python version
+      debug:
+        var: python_version.stdout
+
+    - name: Check disk space
+      command: df -h
+      register: disk_space
+
+    - name: Display disk info
+      debug:
+        var: disk_space.stdout_lines
+
+    - name: Create test directory
+      file:
+        path: /opt/test-ansible
+        state: directory
+        mode: '0755'
+
+    - name: Verify directory creation
+      stat:
+        path: /opt/test-ansible
+      register: test_dir
+
+    - name: Show directory status
+      debug:
+        msg: "Test directory created: {{ test_dir.stat.exists }}"

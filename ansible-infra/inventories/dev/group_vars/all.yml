@@ -1,0 +1,5 @@
+---
+timezone: Asia/Kolkata
+health_api_image: uvinodk/health-api
+health_api_tag: dev
+health_api_port: 8080

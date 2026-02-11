@@ -1,0 +1,22 @@
+---
+- name: Create app directory
+  file:
+    path: /opt/health-api
+    state: directory
+    owner: ansible
+    group: ansible
+    mode: '0755'
+
+- name: Pull Health API Docker image
+  docker_image:
+    name: "{{ health_api_image }}:{{ health_api_tag }}"
+    source: pull
+
+- name: Run Health API container
+  docker_container:
+    name: health-api-dev
+    image: "{{ health_api_image }}:{{ health_api_tag }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ health_api_port }}:8000"
