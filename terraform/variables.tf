@@ -23,6 +23,16 @@ variable "environment" {
   default = "prod"
 }
 
+variable "project_name" {
+  type    = string
+  default = "health-api-service"
+}
+
+variable "owner" {
+  type    = string
+  default = "uvinodk"
+}
+
 variable "image_tag" {
   type    = string
   default = "latest"

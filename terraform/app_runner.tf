@@ -12,6 +12,11 @@ resource "aws_iam_role" "apprunner_access" {
       }
     ]
   })
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+    Owner       = var.owner
+  }
 }
 
 resource "aws_iam_role_policy" "apprunner_access_policy" {
@@ -66,8 +71,13 @@ resource "aws_apprunner_service" "app" {
     memory = "2048"
   }
 
-  tags = { Environment = var.environment }
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+    Owner       = var.owner
+  }
 }
+
 
 output "apprunner_service_arn" {
   value = var.use_apprunner ? aws_apprunner_service.app[0].arn : ""

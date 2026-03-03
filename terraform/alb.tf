@@ -4,8 +4,13 @@ resource "aws_lb" "app" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = module.vpc.public_subnets
-  tags               = { Environment = var.environment }
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+    Owner       = var.owner
+  }
 }
+
 
 resource "aws_security_group" "alb" {
   name        = "health-api-alb-sg"
@@ -33,7 +38,11 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Environment = var.environment }
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+    Owner       = var.owner
+  }
 }
 
 resource "aws_lb_target_group" "app" {
@@ -52,7 +61,11 @@ resource "aws_lb_target_group" "app" {
     matcher             = "200"
   }
 
-  tags = { Environment = var.environment }
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+    Owner       = var.owner
+  }
 }
 
 resource "aws_lb_listener" "http" {
