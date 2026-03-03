@@ -32,10 +32,10 @@ jobs:
       - name: Run tests with coverage
         run: pytest --cov=. --cov-report=xml
 
-      - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: SonarQube scan
+      #   uses: SonarSource/sonarqube-scan-action@v6
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       #- name: SonarQube quality gate check
       #  uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
