@@ -56,6 +56,12 @@ backend "s3" {
 }
 ```
 
+> **Note:** the `region` field in the backend block **must be a literal** and cannot reference a
+> variable. Set it to the same region where you created the S3 bucket. Also make sure you have
+> AWS credentials available (via `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` environment variables
+> or a configured `~/.aws/credentials` file) before running `terraform init`. The backend initialization
+> will fail otherwise.
+
 ## Step 3: Provision AWS Infrastructure
 
 Initialize Terraform and apply the configuration:
