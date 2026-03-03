@@ -1,14 +1,16 @@
 replicaCount: 3
 
 image:
-  repository: ghcr.io/uvinodk/health-api-service
+  # ECR repository URL will be set by GitHub Actions at deploy time
+  # Format: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/health-api-service
+  repository: "PLACEHOLDER_ECR_REPO"
   pullPolicy: IfNotPresent
   tag: "latest"
 
 namespace: health-api
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 8000
   targetPort: 8000
 

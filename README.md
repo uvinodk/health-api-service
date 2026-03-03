@@ -244,6 +244,135 @@ Check deployment:
 kubectl get all -n health-api
 ```
 
+## AWS Deployment
+
+### Prerequisites
+
+- AWS account with appropriate permissions
+- Terraform >= 1.3
+- kubectl configured with AWS credentials
+- GitHub repository with this code
+- S3 bucket for Terraform state (configure in `terraform/provider.tf`)
+
+### Infrastructure Setup
+
+1. **Create Terraform state backend:**
+
+```bash
+# Create S3 bucket for state
+aws s3 mb s3://health-api-tfstate-ACCOUNT_ID
+
+# Create DynamoDB table for state locking
+aws dynamodb create-table \
+  --table-name health-api-tfstate-lock \
+  --attribute-definitions AttributeName=LockID,AttributeType=S \
+  --key-schema AttributeName=LockID,KeyType=HASH \
+  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+```
+
+2. **Update `terraform/provider.tf`:**
+
+Replace `REPLACE_TFSTATE_BUCKET` and `REPLACE_TFSTATE_LOCK_TABLE` with your bucket and table names.
+
+3. **Initialize and apply Terraform:**
+
+```bash
+cd terraform
+terraform init
+terraform plan -out=tfplan
+terraform apply tfplan
+```
+
+This provisions:
+- VPC with public/private subnets
+- EKS cluster (1.27) with managed node groups
+- ECR repository
+- Application Load Balancer (ALB)
+- GitHub Actions OIDC role for CI/CD
+
+### GitHub Actions Setup
+
+1. **Get Terraform outputs:**
+
+```bash
+terraform output github_oidc_role_arn
+terraform output cluster_name
+```
+
+2. **Set GitHub repository secrets:**
+
+Go to repository **Settings → Secrets and variables → Actions** and create:
+
+| Secret Name | Value |
+|---|---|
+| `GITHUB_OIDC_ROLE` | ARN output from `github_oidc_role_arn` |
+| `AWS_REGION` | Your AWS region (e.g., `us-east-1`) |
+| `AWS_ACCOUNT_ID` | Your AWS account ID |
+| `EKS_CLUSTER_NAME` | Output from `cluster_name` |
+
+3. **Workflows:**
+
+- **CI - test, build and push** (`.github/workflows/ci-build-and-push.yaml`):
+  - Runs on every pull request and push to `main`
+  - Runs unit tests
+  - Builds Docker image and pushes to ECR
+
+- **Deploy to EKS** (`.github/workflows/deploy.yaml`):
+  - Runs on push to `main` after tests pass
+  - Updates kubeconfig
+  - Deploys via Helm to EKS
+
+- **Terraform CI** (`.github/workflows/terraform.yml`):
+  - Runs `terraform plan` on PRs modifying `terraform/`
+  - Manual `terraform apply` via workflow dispatch or automatic on push to `main`
+
+### Helm Deployment
+
+The deployment is managed via Helm. Customize in `helm/values.yaml`:
+
+```yaml
+replicaCount: 3
+image:
+  repository: "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/health-api-service"
+  tag: "latest"
+service:
+  type: LoadBalancer
+  port: 8000
+```
+
+GitHub Actions automatically sets the correct image URI during deployment.
+
+### Optional: Enable HTTPS with ACM
+
+```bash
+terraform apply -var="enable_https=true" -var="acm_certificate_arn=arn:aws:acm:..."
+```
+
+Or configure Route53 DNS:
+
+```bash
+terraform apply -var="domain_name=api.example.com" -var="route53_zone_id=Z..."
+```
+
+### Monitoring & Access
+
+After deployment:
+
+```bash
+# Get ALB DNS name
+terraform output alb_dns_name
+
+# Check pod status
+kubectl get pods -n default
+
+# View logs
+kubectl logs -n default deployment/health
+
+# Port-forward for local testing
+kubectl port-forward -n default svc/health 8000:8000
+curl http://localhost:8000/health
+```
+
 #### CI/CD with Self-Hosted Runner
 
 This project uses GitHub Actions with a self-hosted runner to deploy to a local Minikube cluster.
